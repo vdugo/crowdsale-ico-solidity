@@ -6,6 +6,8 @@ const tokens = (n) =>
     return ethers.utils.parseUnits(n.toString(), 'ether')
 }
 
+const ether = tokens
+
 describe('Crowdsale', () => 
 {
     let crowdsale, token, accounts, deployer
@@ -21,7 +23,7 @@ describe('Crowdsale', () =>
         deployer = accounts[0]
         user1 = accounts[1]
 
-        crowdsale = await Crowdsale.deploy(token.address)
+        crowdsale = await Crowdsale.deploy(token.address, ether(1))
 
         let transaction = await token.connect(deployer).transfer(crowdsale.address, tokens(1000000))
         await transaction.wait()
@@ -49,16 +51,19 @@ describe('Crowdsale', () =>
         {
             beforeEach(async () =>
             {
-                
+                transaction = await crowdsale.connect(user1).buyTokens(amount, {value: ether(10)})
+                result = await transaction.wait()
             })
 
             it('transfers tokens', async () =>
             {
-                transaction = await crowdsale.connect(user1).buyTokens(amount)
-                result = await transaction.wait()
-
                 expect(await token.balanceOf(crowdsale.address)).to.equal(tokens(999990))
                 expect(await token.balanceOf(user1.address)).to.equal(amount)
+            })
+
+            it('updates contract ether balance', async () =>
+            {
+                expect(await ethers.provider.getBalance(crowdsale.address)).to.equal(amount)
             })
         })
     })

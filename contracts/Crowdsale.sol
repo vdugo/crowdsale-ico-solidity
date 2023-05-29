@@ -17,7 +17,7 @@ contract Crowdsale
         price = _price;
     }
 
-    function buyTokens(uint256 _amount) public
+    function buyTokens(uint256 _amount) public payable
     {
         token.transfer(msg.sender, _amount);
     }
