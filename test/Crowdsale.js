@@ -106,4 +106,72 @@ describe('Crowdsale', () =>
             })
         })
     })
+
+    describe('Updating Price', () =>
+    {
+        let transaction, result
+        let price = ether(2)
+
+        describe('Success', async () =>
+        {
+            beforeEach(async () =>
+            {
+                transaction = await crowdsale.connect(deployer).setPrice(price)
+                result = await transaction.wait()
+            })
+
+            it('updates the price', async () =>
+            {
+                expect(await crowdsale.price()).to.equal(price)
+            })
+        })
+
+        describe('Failure', async () =>
+        {
+
+        })
+    })
+
+    describe('Finalize Sale', () =>
+    {
+        let transaction, result
+        let amount = tokens(10)
+        let value = ether(10)
+
+        describe('Success', () =>
+        {
+            beforeEach(async () =>
+            {
+                transaction = await user1.sendTransaction({to: crowdsale.address, value: amount})
+                result = await transaction.wait()
+
+                transaction = await crowdsale.connect(deployer).finalize()
+                result = await transaction.wait()
+            })
+
+            it('transfers the remaining tokens to the owner', async () =>
+            {
+                expect(await token.balanceOf(crowdsale.address)).to.equal(0)
+                expect(await token.balanceOf(deployer.address)).to.equal(tokens(999990))
+            })
+
+            it('transfers ETH balance to the owner', async () =>
+            {
+                expect(await ethers.provider.getBalance(crowdsale.address)).to.equal(0)
+            })
+
+            it('emits a Finalize event', async () =>
+            {
+                await expect(transaction).to.emit(crowdsale, 'Finalize').withArgs(amount, value)
+            })
+        })
+
+        describe('Failure', () =>
+        {
+            it('prevents non-owner from finalizing', async () =>
+            {
+                await expect(crowdsale.connect(user1).finalize()).to.be.reverted
+            })
+        })
+    })
 })
