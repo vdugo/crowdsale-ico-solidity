@@ -1,16 +1,14 @@
-import Container from "react-bootstrap"
-import Nav from "react-bootstrap/Nav"
-import NavBar from 'react-bootstrap/Navbar'
-import NavDropdown from 'react-bootstrap/NavDropdown'
+import { Container } from "react-bootstrap"
+
+// Components
+import Navigation from "./Navigation"
 
 function App()
 {
     return(
-        <div>
-            <NavBar bg='dark'></NavBar>
-            <div>Hello World</div>
-            <div>{1 + 1}</div>
-        </div>
+        <Container>
+            <Navigation />
+        </Container>
     )
 }
 
