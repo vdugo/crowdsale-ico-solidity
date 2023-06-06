@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import Navigation from "./Navigation"
 import Info from "./Info"
 import Loading from "./Loading"
+import Progress from "./Progress"
 
 // ABIs
 import TOKEN_ABI from '../abis/Token.json'
@@ -56,6 +57,10 @@ function App()
         const accountBalance = ethers.utils.formatUnits(await token.balanceOf(account), 18)
         setAccountBalance(accountBalance)
 
+        // Introduce a delay of 1 second for testing purposes
+        // with the loading spinner
+        await new Promise(resolve => setTimeout(resolve, 1000));
+
         const price = ethers.utils.formatUnits(await crowdsale.price(), 18)
         setPrice(price)
         const maxTokens = ethers.utils.formatUnits(await crowdsale.maxTokens(), 18)
@@ -77,13 +82,20 @@ function App()
     return(
         <Container>
             <Navigation />
+
+            <h1 className="my-4 text-center">Introducing VIN token</h1>
+
             {isLoading ? 
             (
                 <Loading />
             )
             :
             (
-                <p className="text-center"><strong>Current price: {price} ETH</strong></p>
+                <>
+                    <p className="text-center"><strong>Current price: {price} ETH</strong></p>
+                    <Progress maxTokens={maxTokens} tokensSold={tokensSold} />
+                </>
+                
             )
             }
             <hr />
